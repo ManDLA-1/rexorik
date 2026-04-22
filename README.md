@@ -1,6 +1,6 @@
-# rexouium 🦊💻
+# REXORIK 🦊💻
 
-### rexorik bot — центр обработки заявок и автоматизации
+### Rexorik bot — центр обработки заявок и автоматизации
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge">
@@ -13,7 +13,7 @@
 
 > Фыр~ 🐾 заявки приняты, лапки уже работают
 
-**rexouium** — это мощный бот для обработки заявок, автоматизации задач и управления процессами.
+**REXORIK** — это мощный бот для обработки заявок, автоматизации задач и управления процессами.
 Создан для серверов, команд и инфраструктур, где важны **скорость, контроль и удобство**.
 
 ---
@@ -49,10 +49,8 @@
 ## 🖼 Превью
 
 <p align="center">
-  <img src="https://via.placeholder.com/800x400?text=rexouium+preview" alt="preview">
+  <img src="https://i.imgur.com/ZVbBZtE.jpeg" alt="preview">
 </p>
-
-> 💡 Замени на GIF или скриншоты работы бота
 
 ---
 
