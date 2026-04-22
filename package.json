@@ -1,0 +1,19 @@
+{
+  "name": "rexorik-bot",
+  "version": "1.0.0",
+  "description": "REXORIK — техподдержка MAX мессенджер",
+  "main": "server/sv_main.js",
+  "scripts": {
+    "start": "node server/sv_main.js",
+    "dev": "nodemon server/sv_main.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "better-sqlite3": "^9.4.3",
+    "express": "^4.18.2",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

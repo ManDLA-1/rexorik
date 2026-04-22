@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REXORIK — Панель управления</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f17; color: #e0e0f0; min-height: 100vh; }
+    header { background: #1a1a2e; padding: 16px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #2a2a4a; }
+    header h1 { font-size: 1.4rem; color: #a78bfa; font-weight: 700; }
+    .badge { background: #7c3aed; color: #fff; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; }
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; display: grid; gap: 16px; }
+    .card { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px; padding: 20px; }
+    .card h2 { font-size: 1rem; color: #a78bfa; margin-bottom: 16px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .stat { background: #12122a; border-radius: 8px; padding: 14px; text-align: center; }
+    .stat .val { font-size: 1.8rem; font-weight: 700; color: #a78bfa; }
+    .stat .lbl { font-size: 0.75rem; color: #888; margin-top: 4px; }
+    .toggle-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-purple { background: #7c3aed; color: #fff; }
+    .btn-green  { background: #16a34a; color: #fff; }
+    .btn-red    { background: #dc2626; color: #fff; }
+    .btn-gray   { background: #374151; color: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th    { text-align: left; padding: 8px 12px; color: #888; border-bottom: 1px solid #2a2a4a; }
+    td    { padding: 8px 12px; border-bottom: 1px solid #1e1e3a; }
+    .tag  { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; }
+    .tag-new     { background:#1d4ed8; color:#fff; }
+    .tag-assigned{ background:#7c3aed; color:#fff; }
+    .tag-waiting { background:#b45309; color:#fff; }
+    .tag-inwork  { background:#0f766e; color:#fff; }
+    .tag-done    { background:#15803d; color:#fff; }
+    .tag-rejected{ background:#b91c1c; color:#fff; }
+    .version-bar { font-size: 0.8rem; color: #666; margin-top: 6px; }
+    .dot-green { color: #4ade80; }
+    .dot-red   { color: #f87171; }
+    #login-overlay { position:fixed; inset:0; background:#0f0f17; display:flex; align-items:center; justify-content:center; z-index:100; }
+    #login-box { background:#1a1a2e; padding:32px; border-radius:16px; border:1px solid #2a2a4a; min-width:280px; }
+    #login-box h2 { color:#a78bfa; margin-bottom:16px; }
+    #login-box input { width:100%; padding:10px; background:#12122a; border:1px solid #2a2a4a; border-radius:8px; color:#fff; margin-bottom:12px; }
+    #login-box button { width:100%; }
+  </style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div id="login-box">
+    <h2>🦊 REXORIK</h2>
+    <p style="color:#888;font-size:.85rem;margin-bottom:16px">Веб-панель управления</p>
+    <input type="password" id="secret-input" placeholder="Секретный ключ" />
+    <button class="btn btn-purple" onclick="doLogin()">Войти</button>
+  </div>
+</div>
+
+<header>
+  <span style="font-size:1.6rem">🦊</span>
+  <h1>REXORIK</h1>
+  <span class="badge">Веб-панель</span>
+  <div id="bot-status" style="margin-left:auto;font-size:.85rem;color:#888"></div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>📊 Статистика</h2>
+    <div class="stats" id="stats-block">
+      <div class="stat"><div class="val" id="stat-open">—</div><div class="lbl">Открытых заявок</div></div>
+      <div class="stat"><div class="val" id="stat-users">—</div><div class="lbl">Пользователей</div></div>
+      <div class="stat"><div class="val" id="stat-sites">—</div><div class="lbl">Площадок</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⚙️ Управление</h2>
+    <div class="toggle-row">
+      <button class="btn btn-gray" id="btn-bot"     onclick="toggle('bot')">...</button>
+      <button class="btn btn-gray" id="btn-logging" onclick="toggle('logging')">...</button>
+      <button class="btn btn-gray" id="btn-silent"  onclick="toggle('silent')">...</button>
+      <button class="btn btn-purple" onclick="checkUpdate()">🔄 Проверить обновления</button>
+    </div>
+    <div class="version-bar" id="version-bar">Версия: загрузка...</div>
+  </div>
+
+  <div class="card">
+    <h2>📋 Открытые заявки</h2>
+    <table>
+      <thead><tr><th>Код</th><th>Площадка</th><th>От кого</th><th>Статус</th><th>Исполнитель</th><th>Создана</th></tr></thead>
+      <tbody id="tickets-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>👥 Пользователи</h2>
+    <table>
+      <thead><tr><th>Имя</th><th>Роль</th><th>ID</th><th>chat_id</th></tr></thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let SECRET = "";
+  const STATUS_TAGS = {
+    new:"tag-new",assigned:"tag-assigned",waiting:"tag-waiting",
+    in_work:"tag-inwork",done:"tag-done",rejected:"tag-rejected"
+  };
+  const STATUS_LBL = {
+    new:"Новая",assigned:"Назначена",waiting:"В очереди",
+    in_work:"В работе",done:"Выполнена",rejected:"Отклонена"
+  };
+
+  function doLogin() {
+    SECRET = document.getElementById("secret-input").value;
+    loadAll();
+  }
+
+  async function api(path, method = "GET") {
+    const r = await fetch(path, { method, headers: { "x-secret": SECRET } });
+    if (r.status === 401) { alert("Неверный ключ"); return null; }
+    return r.json();
+  }
+
+  async function loadAll() {
+    const [status, tickets, users, sites, version] = await Promise.all([
+      api("/api/status"), api("/api/tickets"), api("/api/users"),
+      api("/api/sites"),  api("/api/version")
+    ]);
+    if (!status) return;
+
+    document.getElementById("login-overlay").style.display = "none";
+
+    // Stats
+    document.getElementById("stat-open").textContent  = status.open_tickets;
+    document.getElementById("stat-users").textContent = users.length;
+    document.getElementById("stat-sites").textContent = sites.length;
+
+    // Bot status
+    document.getElementById("bot-status").innerHTML =
+      `Бот: ${status.bot_active ? '<span class="dot-green">●</span> ВКЛ' : '<span class="dot-red">●</span> ВЫКЛ'}`;
+
+    // Buttons
+    document.getElementById("btn-bot").textContent     = status.bot_active  ? "🟢 Бот: ВКЛ"    : "🔴 Бот: ВЫКЛ";
+    document.getElementById("btn-logging").textContent = status.logging     ? "📋 Логи: ВКЛ"   : "📋 Логи: ВЫКЛ";
+    document.getElementById("btn-silent").textContent  = status.silent_mode ? "🔕 Тихий: ВКЛ"  : "🔔 Тихий: ВЫКЛ";
+
+    // Version
+    if (version) {
+      const upd = version.upToDate ? `<span class="dot-green">●</span> Актуально` : `<span class="dot-red">●</span> Доступно обновление`;
+      document.getElementById("version-bar").innerHTML =
+        `Версия: <code>${version.local}</code> ${upd}`;
+    }
+
+    // Tickets
+    const tb = document.getElementById("tickets-tbody");
+    tb.innerHTML = tickets.map(t => `
+      <tr>
+        <td><b>${t.ticket_code||"#"+t.id}</b></td>
+        <td>${t.site_name||"—"}</td>
+        <td>${t.user_name||"—"}</td>
+        <td><span class="tag ${STATUS_TAGS[t.status]||''}">${STATUS_LBL[t.status]||t.status}</span></td>
+        <td>${t.assignee_name||"—"}</td>
+        <td>${t.created_at||"—"}</td>
+      </tr>`).join("") || `<tr><td colspan="6" style="color:#555;text-align:center">Нет открытых заявок</td></tr>`;
+
+    // Users
+    const ub = document.getElementById("users-tbody");
+    const roleLabels = { ROOT:"Руководитель", SW:"Супервайзер", TECH:"Техник", SPEC:"Следящий" };
+    ub.innerHTML = users.map(u => `
+      <tr>
+        <td><b>${u.display_name||u.name}</b></td>
+        <td>${roleLabels[u.role]||u.role}</td>
+        <td><code>${u.user_id}</code></td>
+        <td><code>${u.chat_id||"—"}</code></td>
+      </tr>`).join("");
+  }
+
+  async function toggle(what) {
+    await api(`/api/toggle_${what}`, "POST");
+    await loadAll();
+  }
+
+  async function checkUpdate() {
+    document.getElementById("version-bar").innerHTML = "🔄 Проверяю...";
+    await api("/api/update_check", "POST");
+    setTimeout(loadAll, 2000);
+  }
+
+  // Автообновление каждые 30 сек
+  setInterval(() => { if (SECRET) loadAll(); }, 30000);
+</script>
+</body>
+</html>
