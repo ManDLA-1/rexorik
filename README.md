@@ -82,7 +82,7 @@ BASE_URL=api_url
 ### 4. Запуск
 
 ```bash
-node index.js
+node server/sv_main.js
 ```
 
 ---
